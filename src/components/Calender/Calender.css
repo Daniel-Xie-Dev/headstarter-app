@@ -1,0 +1,26 @@
+.ModalTitle {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.ModalInput {
+  /* width: 100%; */
+  outline: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.ModalInputContainer {
+  margin: 0;
+  width: max-content;
+}
+
+.DateTimeInput {
+  width: 100%;
+}
+
+.Calendar {
+  width: 100%;
+}
