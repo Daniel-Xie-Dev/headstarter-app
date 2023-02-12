@@ -5,7 +5,14 @@ const GlobalContext = createContext({});
 
 // create a provider to share your store accross your entire app
 export const StoreProvider = ({ children }) => {
-  const store = {};
+  const [user, setUser] = useState();
+  const [userData, setUserData] = useState();
+  const store = {
+    user,
+    userData,
+    setUser,
+    setUserData
+  };
 
   return <GlobalContext.Provider value={store}>{children}</GlobalContext.Provider>;
 };
