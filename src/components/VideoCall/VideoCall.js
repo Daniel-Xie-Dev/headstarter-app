@@ -7,6 +7,7 @@ import Videos from "./Videos";
 
 function VideoCall(props) {
   const { setInCall } = props;
+
   const [users, setUsers] = useState([]);
   const [start, setStart] = useState(false);
   const client = useClient();
@@ -57,6 +58,7 @@ function VideoCall(props) {
     if (ready && tracks) {
       try {
         init(channelName);
+        console.log("Resolved!");
       } catch (error) {
         console.log(error);
       }

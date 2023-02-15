@@ -1,4 +1,3 @@
-import { VideoCall } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore/lite";
 import React from "react";
@@ -9,6 +8,7 @@ import Calender from "../components/Calender/Calender";
 import SideNavigation from "../components/SideNavigation/SideNavigation";
 import { db } from "../firebase";
 import { useStore } from "../useStore";
+import VideoCall from "../components/VideoCall/VideoCall";
 
 function Home() {
   const [index, setIndex] = useState(0);

@@ -7,11 +7,11 @@ import { ProSidebarProvider } from "react-pro-sidebar";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <StoreProvider>
-      <ProSidebarProvider>
-        <App />
-      </ProSidebarProvider>
-    </StoreProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <StoreProvider>
+    <ProSidebarProvider>
+      <App />
+    </ProSidebarProvider>
+  </StoreProvider>
+  // </React.StrictMode>
 );
