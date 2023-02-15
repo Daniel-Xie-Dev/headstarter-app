@@ -57,7 +57,7 @@ function Controls(props) {
         </Button>
       </Grid>
       <Grid item>
-        <Button variant="contained" color="default" onClick={() => leaveChannel()}>
+        <Button variant="contained" onClick={() => leaveChannel()}>
           Leave <ExitToAppIcon />
         </Button>
       </Grid>

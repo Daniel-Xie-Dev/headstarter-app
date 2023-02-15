@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 
 function Videos(props) {
   const { users, tracks } = props;
-  const { gridSapcing, setGridSpacing } = useState(12);
+  const [ gridSpacing, setGridSpacing ] = useState(12);
+  console.log(users.length);
 
   useEffect(() => {
     setGridSpacing(Math.max(Math.floor(12 / (users.length + 1)), 4));
@@ -13,15 +14,15 @@ function Videos(props) {
 
   return (
     <Grid container style={{ height: "100%" }}>
-      <Grid item xs={gridSapcing}>
+      <Grid item xs={gridSpacing}>
         <AgoraVideoPlayer videoTrack={tracks[1]} style={{ height: "100%", width: "100%" }} />
       </Grid>
-      <Grid item xs={gridSapcing}>
+      
         {users.length > 0 &&
           users.map((user) => {
             if (user.videoTrack) {
               return (
-                <Grid item xs={gridSapcing}>
+                <Grid item xs={gridSpacing}>
                   <AgoraVideoPlayer
                     key={user.uid}
                     videoTrack={user.videoTrack}
@@ -30,10 +31,9 @@ function Videos(props) {
                 </Grid>
               );
             } else {
-              return null;
+              return <></>;
             }
           })}
-      </Grid>
     </Grid>
   );
 }
