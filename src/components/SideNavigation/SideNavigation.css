@@ -1,0 +1,10 @@
+.rightClick {
+  z-index: 12;
+  width: max-content;
+  position: fixed;
+  color: white;
+  padding: 10px;
+  /* border-radius: 20px; */
+  cursor: pointer;
+  /* background-color: blue; */
+}
