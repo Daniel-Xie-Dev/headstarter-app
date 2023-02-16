@@ -14,7 +14,6 @@ import emailjs from "@emailjs/browser";
 import {
   addDoc,
   arrayRemove,
-  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -64,13 +63,14 @@ const Event = ({ event }) => {
 
 function Calender({ group, index }) {
   // console.log(...group.data().events);
-  const { user } = useStore();
+  const { user, userData } = useStore();
   const [showModal, setShowModal] = useState(false);
   const [events, setEvents] = useState([]);
   const [isEdit, setisEdit] = useState(false);
   const [event, setEvent] = useState({
     owner: user.uid,
-    title: "New Event",
+    groupId: group ? group.id : null,
+    title: "",
     start: new Date(),
     end: new Date(),
     description: "",
@@ -81,13 +81,13 @@ function Calender({ group, index }) {
   useEffect(() => {
     const getEvents = async () => {
       const response = (
-        await getDocs(
-          query(collection(db, "events"), where("__name__", "in", [...group.data().events, "temp"]))
-        )
+        await getDocs(query(collection(db, "events"), where("groupId", "==", group.id)))
       ).docs;
       setEvents(response);
     };
-    getEvents();
+    if (group) {
+      getEvents();
+    }
   }, [group]);
 
   const codeSnippet = () => {
@@ -107,8 +107,11 @@ function Calender({ group, index }) {
     codeSnippet();
     setisEdit(true);
 
+    // console.log(event);
+
     setEvent({
       id: event.id,
+      groupId: event.groupId,
       owner: event.owner,
       start: event.start,
       end: event.end,
@@ -126,26 +129,25 @@ function Calender({ group, index }) {
     if (isEdit) {
       const eventid = object.id;
       delete object.id;
-      // console.log(object);
-      await updateDoc(doc(db, "events", event.id), object);
-      let array = removeFromEvents(eventid);
-      const eventRef = await getDoc(doc(db, "events", event.id));
-      setEvents([...array, eventRef]);
+
+      await updateDoc(doc(db, "events", eventid), object);
+      const eventRef = await getDoc(doc(db, "events", eventid));
+
+      setEvents([
+        ...events.filter((event) => {
+          return event.id !== eventid;
+        }),
+        eventRef,
+      ]);
     } else {
       const eventObject = await addDoc(collection(db, "events"), object);
-
-      await updateDoc(doc(db, "groups", group.id), {
-        events: arrayUnion(eventObject.id),
-      });
 
       const eventRef = await getDoc(doc(db, "events", eventObject.id));
       setEvents([...events, eventRef]);
     }
 
     if (sendEmail) {
-      const usersInGroup = group.data().users;
-
-      const q = query(collection(db, "users"), where("__name__", "in", [...usersInGroup, "temp"]));
+      const q = query(collection(db, "users"), where("group", "==", group.id));
       const users = (await getDocs(q)).docs;
 
       for (let i = 0; i < users.length; i++) {
@@ -162,7 +164,8 @@ function Calender({ group, index }) {
     setShowModal(false);
     setEvent({
       owner: null,
-      title: "New Event",
+      groupId: group.id,
+      title: "",
       start: new Date(),
       end: new Date(),
       description: "",
@@ -176,8 +179,7 @@ function Calender({ group, index }) {
       await updateDoc(doc(db, "groups", group.id), {
         events: arrayRemove(eventId),
       });
-      let array = removeFromEvents(eventId);
-      setEvents(array);
+      removeFromEvents(eventId);
       setShowModal(false);
     } catch (error) {
       console.log(error);
@@ -185,27 +187,23 @@ function Calender({ group, index }) {
   };
 
   const removeFromEvents = (eventId) => {
-    let array = [...events];
-
-    for (let i = 0; i < array.length; i++) {
-      if (array[i].id === eventId) {
-        array.splice(i, 1);
-        break;
-      }
-    }
-
-    return array;
+    // console.log(events.filter((event) => event.id !== eventId));
+    setEvents((events) => {
+      return events.filter((event) => event.id !== eventId);
+    });
   };
 
   return (
     <>
-      {group && (
+      {group ? (
         <>
           <Modal show={showModal} className="Modal">
             <Modal.Header className="ModalTitle">
               <Modal.Title>
-                {event.start !== null ? event.start.toLocaleDateString() : null} -{" "}
+                {event.start !== null ? event.start.toLocaleDateString() : null}
               </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
               <h4 className="ModalInputContainer">
                 <input
                   className="ModalInput"
@@ -214,8 +212,6 @@ function Calender({ group, index }) {
                   onChange={(e) => setEvent({ ...event, title: e.target.value })}
                 ></input>
               </h4>
-            </Modal.Header>
-            <Modal.Body>
               <h5>Start Date & Time:</h5>
               <DateTimePicker
                 className="DateTimeInput"
@@ -252,7 +248,7 @@ function Calender({ group, index }) {
               <Button variant="secondary" onClick={() => setShowModal(false)}>
                 Close
               </Button>
-              {event.owner === user.uid && isEdit ? (
+              {isEdit && (userData.isAdmin || event.owner === user.uid) ? (
                 <Button variant="warning" onClick={deleteEvent}>
                   Remove Event
                 </Button>
@@ -260,7 +256,7 @@ function Calender({ group, index }) {
                 <></>
               )}
 
-              {event.owner === user.uid ? (
+              {event.owner === user.uid || userData.isAdmin ? (
                 <Button variant="primary" onClick={createEvent}>
                   Save Event
                 </Button>
@@ -280,6 +276,7 @@ function Calender({ group, index }) {
               const object = {
                 id: event.id,
                 owner: data.owner,
+                groupId: data.groupId,
                 start: data.start.toDate(),
                 end: data.end.toDate(),
                 title: data.title,
@@ -300,6 +297,18 @@ function Calender({ group, index }) {
             }}
           />
         </>
+      ) : (
+        <h4
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Please wait until you are assigned a group
+        </h4>
       )}
     </>
   );

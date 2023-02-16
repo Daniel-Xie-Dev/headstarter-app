@@ -18,17 +18,48 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [current, setCurrent] = useState(true);
   const { setUser, setUserData } = useStore();
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastNameError, setLastNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
+    let error = false;
+
+    if (firstName.length < 1) {
+      setFirstNameError("Invalid First Name Length");
+      error = true;
+    }
+
+    if (lastName.length < 1) {
+      setLastNameError("Invalid Last Name Length");
+      error = true;
+    }
+
+    const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!email.match(emailRegEx)) {
+      setEmailError("Invalid Email!");
+      error = true;
+    }
+
+    if (password.length < 8) {
+      setPasswordError("Password must be atleast characters!");
+      error = true;
+    }
+
+    if (error) return;
+
     const user = await createUserWithEmailAndPassword(auth, email, password);
+
     setUser(user.user);
     await setDoc(doc(db, "users", user.user.uid), {
       firstName: firstName,
       lastName: lastName,
-      groups: [],
+      group: "",
       email: email,
+      isAdmin: false,
     });
     handleSignIn();
   };
@@ -54,6 +85,7 @@ function SignIn() {
                   placeholder="name@example.com"
                   onChange={(e) => setFirstName(e.target.value)}
                 />
+                <p className="SignInError">{firstNameError}</p>
               </FloatingLabel>
             </Col>
             <Col md>
@@ -64,6 +96,7 @@ function SignIn() {
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </FloatingLabel>
+              <p className="SignInError">{lastNameError}</p>
             </Col>
           </Row>
         </div>
@@ -79,6 +112,7 @@ function SignIn() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </FloatingLabel>
+          <p className="SignInError">{emailError}</p>
           <FloatingLabel controlId="floatingInputGrid" label="Password">
             <Form.Control
               type="password"
@@ -86,6 +120,7 @@ function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </FloatingLabel>
+          <p className="SignInError">{passwordError}</p>
         </Row>
       </div>
 

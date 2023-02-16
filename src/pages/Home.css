@@ -1,0 +1,11 @@
+.DisplayContainer {
+  width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  /* margin: auto; */
+}
+
+.HomeButtons {
+  /* width: 50%; */
+}
