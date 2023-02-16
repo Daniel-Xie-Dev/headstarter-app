@@ -8,6 +8,7 @@ import SideNavigation from "../components/SideNavigation/SideNavigation";
 import { db } from "../firebase";
 import { useStore } from "../useStore";
 import { Button } from "@mui/material";
+import VideoCall from "../components/VideoCall/VideoCall"
 import "./Home.css";
 
 function Home() {
@@ -64,7 +65,7 @@ function Home() {
 
           <div className="DisplayContainer">
             {inCall ? (
-              <></>
+              <VideoCall setInCall={setInCall}></VideoCall>
             ) : (
               <Calender group={groups.length !== 0 ? groups[index] : null} index={index} />
             )}
