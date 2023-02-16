@@ -62,6 +62,7 @@ const Event = ({ event }) => {
 };
 
 function Calender({ group, index }) {
+  // console.log(group.id);
   // console.log(...group.data().events);
   const { user, userData } = useStore();
   const [showModal, setShowModal] = useState(false);
@@ -69,7 +70,7 @@ function Calender({ group, index }) {
   const [isEdit, setisEdit] = useState(false);
   const [event, setEvent] = useState({
     owner: user.uid,
-    groupId: group ? group.id : null,
+    groupId: null,
     title: "",
     start: new Date(),
     end: new Date(),
@@ -98,7 +99,13 @@ function Calender({ group, index }) {
   const handleOpenSlot = (e) => {
     codeSnippet();
     setisEdit(false);
-    setEvent({ ...event, owner: user.uid, start: new Date(e.start), end: new Date(e.end) });
+    setEvent({
+      ...event,
+      groupId: group.id,
+      owner: user.uid,
+      start: new Date(e.start),
+      end: new Date(e.end),
+    });
   };
 
   const editEvent = (event) => {
@@ -122,7 +129,6 @@ function Calender({ group, index }) {
 
   const createEvent = async () => {
     let object = { ...event };
-
     object.start = Timestamp.fromDate(object.start);
     object.end = Timestamp.fromDate(object.end);
 
@@ -273,6 +279,7 @@ function Calender({ group, index }) {
             step={15}
             events={events.map((event, index) => {
               const data = event.data();
+              console.log(data);
               const object = {
                 id: event.id,
                 owner: data.owner,
